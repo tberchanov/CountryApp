@@ -1,6 +1,5 @@
-package com.example.android.countriesapp
+package com.android.countriesapp.tools.tests
 
-import com.android.countriesapp.tools.tests.LogTestRule
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test

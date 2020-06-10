@@ -14,6 +14,7 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/data_countries" />
             <option value="$PROJECT_DIR$/domain_countries" />
+            <option value="$PROJECT_DIR$/tools_tests" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

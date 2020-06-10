@@ -1,3 +1,4 @@
+include ':tools_tests'
 include ':domain_countries'
 include ':data_countries'
 include ':app'
