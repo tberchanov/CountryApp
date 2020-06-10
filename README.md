@@ -33,8 +33,6 @@ Then lets use our rule in tests in the app module. IDE will allow us to do it wi
 But if we will try to run test from app module, the following compilation error will appear:
 > Unresolved reference: LogTestRule
 
-## Solution: move test utils code to main source directory
-
 As `tools_tests` is a utils module that contains utils stuff only for modules, we can move utils code from test sources to main sources.
 
 ![alt text](https://github.com/tberchanov/CountryApp/blob/master/.readme_images/tools_tests_directories_example.png?raw=true)
@@ -57,5 +55,50 @@ This utils functions can be very useful for `domain_countries` module, as this m
 
 The previous solution can not be used here, because `data_countries` module contains not only testing code and `testImplementation` can not be used here.
 Theoretically we can move all testing code from `data_countries` to separate module, and name it `data_countries_tests`.
-In this situation, previous solution can be used, but for me it looks like over-engineering.
+In this situation, previous solution can be used, but for me it looks like over-engineering.  
 For such cases I would use another solution.
+
+Lets create shared test sources inside `data_countries` module.  
+For this you need to create folder `sharedTest/java/{module package name}` and move there code, that should be shared, `CountriesCreator` in our case.
+
+![alt text](https://github.com/tberchanov/CountryApp/blob/master/.readme_images/data_countries_directories_example.png?raw=true)
+
+Then you need to add the following code inside `android` block in `data_countries/build.gradle`:
+```groovy
+sourceSets {
+        test {
+            java.srcDirs += "src/sharedTest/java"
+        }
+        main {
+            if (Boolean.valueOf(project.findProperty("com.android.countriesapp.share.test.enabled"))) {
+                java.srcDirs += "src/sharedTest/java"
+            }
+        }
+}
+```
+
+There are a few interesting things:
+* `java.srcDirs += "src/sharedTest/java"` - just adds path to the list of source directories
+* `com.android.countriesapp.share.test.enabled` - is a property that enables or disables shared tests sources in the main sources.  
+It is not good to add shared tests sources to the main for release builds, as we don't want to have such code in the final apk.
+In the same time we may need shared code in the main for debug builds or CI.  
+This property is located in `gradle.properties` file.
+
+If your shared code contains some testings library sdk, you should add this dependencies not only by `testImplementation`, but with `implementation` also.
+But again, we don't need to have redundant dependencies for production ready builds, thats why we should enable them only by property.
+For this reason, the following code should be written in `data_countries/build.gradle`:
+
+```groovy
+dependencies {
+    // ...
+    testImplementation "org.mockito:mockito-core:3.3.3"
+    if (Boolean.valueOf(project.findProperty("com.android.countriesapp.share.test.enabled"))) {
+        implementation "org.mockito:mockito-core:3.3.3"
+    }
+    // ...
+}
+```
+
+As result, the code from `sharedTest` source directory can be used across multiple modules.  
+I hope this project will help you. If you have other ideas how this problem can be solved, be sure to write me.  
+Thanks for reading =)
