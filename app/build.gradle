@@ -21,6 +21,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    sourceSets {
+        test.java.srcDirs += ["${project(':domain_countries').projectDir}/src/test/java"]
+    }
 }
 
 dependencies {
@@ -41,5 +45,8 @@ dependencies {
     implementation project(path: ':domain_countries')
     testImplementation project(path: ':tools_tests')
 
+    // Tests
     testImplementation 'junit:junit:4.12'
+    testImplementation "org.mockito:mockito-core:3.3.3"
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.7'
 }
