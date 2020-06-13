@@ -14,7 +14,9 @@ I faced with a few not very obvious things in combining this two common approach
 
 The main pitfall here is that code from tests sources directories can not be used directly from another module.
 For example in project you can find very useful `LogTestRule`, that placed in `tools_tests` module.
-Lets try to use this rule in test from `app` module.
+Lets try to use this rule in the test from `app` module.
+
+![alt text](https://github.com/tberchanov/CountryApp/blob/master/.readme_images/app%20-%20tools_tests%20dependency.png?raw=true)
 
 For this we need to add `tools_tests` dependency in the `app/build.gradle`.
 ```groovy
@@ -52,6 +54,8 @@ And here we come to the next problem.
 
 In the module `data_countries` we have tests for repository `RemoteCountriesRepositoryTest` and some utils functions for creating mocks in `CountriesCreator`.
 This utils functions can be very useful for `domain_countries` module, as this module has test `CountriesMapperTest`, where entities from `data_countries` should be mocked.
+
+![alt text](https://github.com/tberchanov/CountryApp/blob/master/.readme_images/domain_countries%20-%20data_countries%20dependency.png?raw=true)
 
 The previous solution can not be used here, because `data_countries` module contains not only testing code and `testImplementation` can not be used here.
 Theoretically we can move all testing code from `data_countries` to separate module, and name it `data_countries_tests`.
@@ -99,6 +103,28 @@ dependencies {
 }
 ```
 
-As result, the code from `sharedTest` source directory can be used across multiple modules.  
+As result, the code from `sharedTest` source directory can be used across multiple modules.
+
+But this solution looks too complicated. We have a lot of overhead stuff like property, shared folder and duplication of dependencies for code from shared folder.  
+If you want to get rid of these complexities, you can use the next solution.
+
+## Final solution
+
+For example, we need to use `LoadCountriesUseCaseCreator` from `domain_countries` module in the `app` module.
+
+![alt text](https://github.com/tberchanov/CountryApp/blob/master/.readme_images/app%20-%20domain_counttries%20dependency.png?raw=true)
+
+For this purpose we can write the following in the `app/build.gradle`:
+
+```groovy
+android {
+    // ...
+    sourceSets {
+        test.java.srcDirs += ["${project(':domain_countries').projectDir}/src/test/java"]
+    }
+}
+```
+
+And that's it, just almost one line solution for this problem, that seemed not trivial at the beginning.  
 I hope this project will help you. If you have other ideas how this problem can be solved, be sure to write me.  
 Thanks for reading =)
